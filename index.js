@@ -3,6 +3,61 @@ var url = "http://st.depositphotos.com/1000315/4169/i/450/depositphotos_41698135
 
 var offset = 5;
 
+var data_object = {
+    MAX_SIZE: 25,
+    
+    // a set of queues of emotion data
+    scores: {},   
+    
+    // Run once on construction. Fills an object with k:v 
+    // e.g. 
+    // scores: {
+    //     "anger": {"queue": [], "avg" : 10}, ...
+    construct_scores: function(data) {
+        for (var key in data["scores"]) {
+            if (data.hasOwnProperty(key)) {
+                scores[key]["queue"] = [ data["scores"][key] ];
+                scores[key]["avg"] = data["scores"][key];
+            }
+        }   
+    },
+    
+    // updates scores
+    update: function(data) {
+        for (var key in data["scores"]) {
+            if (data.hasOwnProperty(key)) {
+                // update queues
+                scores[key]["queue"].push(data["scores"][key]);
+                
+                // and averages
+                scores[key]["avg"] = get_average(key, data["scores"][key]);
+            }
+        }
+    },
+
+    // gets the average value from a score's queue
+    get_average: function(key) {
+        sum = scores[key]["queue"].reduce((p, c) => c += p);
+        return sum / scores[key]["queue"].length;
+    },
+
+    // gets the average value from a score's queue
+    get_n_average: function(key, nframes) {
+        var len = scores[key]["queue"].length;
+        var sum = scores[key]["queue"].slice(len - nframes, len+1).reduce((p, c) => c += p);
+        return sum / len;
+    },
+
+    // Gets an n-frame immediate change in emotion score from current average
+    get_change: function(data, key, nframes="all") {
+        if (nframes == "all") {
+            return scores[key]["avg"] - data[key];
+        } else {
+            return get_n_average(key, nframes) - data[key];
+        }
+    },
+}
+
 window.onready = function() {
 	$(function() {
 		$.ajax({ 
