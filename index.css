@@ -1,0 +1,29 @@
+h1 {
+	text-align: center;
+}
+
+.box {
+	border:5px solid red;
+	position:absolute;
+	border-radius:50%;
+}
+
+.box:hover {
+	cursor: pointer;
+	/*animation-name: emphasize;
+	animation-iteration-count: infinite;
+	animation-timing-function:linear;
+	animation-duration: 3s;*/
+}
+
+@keyframes emphasize {
+	0% {
+		transform: scale(1,1);
+	}
+	50% {
+		transform: scale(2, 2);
+	}
+	100% {
+		transform: scale(1,1);
+	}
+}
